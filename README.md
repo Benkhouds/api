@@ -1,7 +1,5 @@
 ## Application structure
 
----
-
 server.js:
 
 > calling the database connection function , registering routes and middleware and listening to port 8080
