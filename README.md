@@ -20,6 +20,6 @@ config folder:
 
 > contains a db.js file for establishing the connection with the database
 
-.env file
+.env file (ignored in .gitignore)
 
 > secrets and uris
