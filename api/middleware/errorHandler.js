@@ -1,4 +1,4 @@
-import ErrorResponse from '../utils/errorResponse.js';
+import ErrorResponse from 'error-module';
 
 const errorHandler = (err, req, res, next) => {
    if (err instanceof ErrorResponse) {
@@ -8,18 +8,9 @@ const errorHandler = (err, req, res, next) => {
       });
    }
 
-   //making a copy of the existing error
-   //and we change its value if we encounter on of the following errors
-   //this is just for development purposes
-   //in production if the error is not identified i would send a 500 internal server error
-   //also if i had more time i would've used winston for logging
-   //and separated the Production environment with the development one
-
-   let error = { ...err };
-
+   let error;
    if (err.code === 11000) {
-      const message = 'User already exist';
-      error = new ErrorResponse(message, 400);
+      error = new ErrorResponse('User already exist', 400);
    }
    if (err.name === 'ValidationError') {
       //mongoose validation

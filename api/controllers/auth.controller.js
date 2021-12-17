@@ -1,40 +1,12 @@
 import User from '../models/User.js';
-import ErrorResponse from '../utils/errorResponse.js';
+import ErrorResponse from 'error-module';
 import { sendAccessToken, sendRefreshToken } from '../utils/sendTokens.js';
-import jwt from 'jsonwebtoken';
 
 export default class AuthController {
    //sending new refresh and accessToken
 
-   static async getRefreshToken(req, res, next) {
-      //to get a new token you need to already have a valid one
-      const token = req.cookies.jid;
-      if (!token) {
-         return next(new ErrorResponse('Error authenticating', 401));
-      }
-
-      let payload = null;
-      try {
-         //verifying the validity of the token
-         payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-      } catch (err) {
-         console.log(err);
-         return next(new ErrorResponse('Error authenticating', 401));
-      }
-
-      //finding the user by id (extracted from the token)
-      const user = await User.findById(payload.id);
-
-      if (!user) {
-         return next(new ErrorResponse('Error authenticating', 401));
-      }
-      //token version for revoking the access token when needed
-      if (user.tokenVersion !== payload.version) {
-         return next(new ErrorResponse('Error authenticating', 401));
-      }
-
+   static async getRefreshToken(_req, res, _next) {
       sendRefreshToken(res, user.createRefreshToken());
-
       sendAccessToken(res, user);
    }
 
@@ -82,6 +54,28 @@ export default class AuthController {
          }
       } catch (error) {
          next(error);
+      }
+   }
+
+   static async logout(req, res, next) {
+      try {
+         //revoking the refresh token (incrementing the version)
+         const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $inc: { tokenVersion: 1 } },
+            { new: true }
+         );
+         if (!user) {
+            return next(new ErrorResponse('Forbidden action', 403));
+         }
+         res.cookie('jid', '', {
+            httpOnly: true,
+            path: '/api/v1/auth/refresh-token',
+         });
+
+         res.status(200).json({ success: true });
+      } catch (err) {
+         next(err);
       }
    }
 }
