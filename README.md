@@ -20,6 +20,10 @@ config folder:
 
 > contains a db.js file for establishing the connection with the database
 
+error-module folder:
+
+> contains an ErrorResponse class as a module.
+
 .env file (ignored in .gitignore)
 
 > secrets and uris
