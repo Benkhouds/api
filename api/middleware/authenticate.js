@@ -53,6 +53,7 @@ async function verifyRefreshToken(req, _res, next) {
    if (user.tokenVersion !== payload.version) {
       return next(new ErrorResponse('Error authenticating', 401));
    }
+   req.user = user;
    next();
 }
 

@@ -5,9 +5,9 @@ import { sendAccessToken, sendRefreshToken } from '../utils/sendTokens.js';
 export default class AuthController {
    //sending new refresh and accessToken
 
-   static async getRefreshToken(_req, res, _next) {
-      sendRefreshToken(res, user.createRefreshToken());
-      sendAccessToken(res, user);
+   static async getRefreshToken(req, res, _next) {
+      sendRefreshToken(res, req.user.createRefreshToken());
+      sendAccessToken(res, req.user);
    }
 
    static async register(req, res, next) {
